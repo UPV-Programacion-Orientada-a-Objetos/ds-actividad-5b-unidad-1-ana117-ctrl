@@ -61,6 +61,54 @@ private:
         cout << "Liberando memoria de Matriz Dinámica..." << endl;
         liberarMemoria();
     }
+
+    // Constructor de copia (deep copy)
+    MatrizDinamica(const MatrizDinamica<T>& otra) : MatrizBase<T>(otra._filas, otra._columnas) {
+        asignarMemoria();
+        for (int i = 0; i < this->_filas; i++) {
+            for (int j = 0; j < this->_columnas; j++) {
+                _datos[i][j] = otra._datos[i][j];
+            }
+        }
+    }
+
+    // Operador de asignación (deep copy)
+    MatrizDinamica<T>& operator=(const MatrizDinamica<T>& otra) {
+        if (this != &otra) {
+            liberarMemoria();
+            this->_filas = otra._filas;
+            this->_columnas = otra._columnas;
+            asignarMemoria();
+            for (int i = 0; i < this->_filas; i++) {
+                for (int j = 0; j < this->_columnas; j++) {
+                    _datos[i][j] = otra._datos[i][j];
+                }
+            }
+        }
+        return *this;
+    }
+
+    // Constructor de movimiento
+    MatrizDinamica(MatrizDinamica<T>&& otra) noexcept : MatrizBase<T>(otra._filas, otra._columnas) {
+        _datos = otra._datos;
+        otra._datos = nullptr;
+        otra._filas = 0;
+        otra._columnas = 0;
+    }
+
+    // Operador de asignación de movimiento
+    MatrizDinamica<T>& operator=(MatrizDinamica<T>&& otra) noexcept {
+        if (this != &otra) {
+            liberarMemoria();
+            this->_filas = otra._filas;
+            this->_columnas = otra._columnas;
+            _datos = otra._datos;
+            otra._datos = nullptr;
+            otra._filas = 0;
+            otra._columnas = 0;
+        }
+        return *this;
+    }
     
     void cargarValores() override {
         cout << "Ingrese los valores para la matriz (" << this->_filas << "x" << this->_columnas << "):" << endl;
@@ -106,12 +154,16 @@ int main() {
     A->setValor(1, 0, 3.5f);
     A->setValor(1, 1, 4.0f);
     
-    cout << "Matriz A:" << endl;
+    cout << "Matriz A (original):" << endl;
     A->imprimir();
+    cout<<endl;
+
+    //probar constructor de copia 
+    MatrizDinamica<float>B(*A);
+    cout << "Matriz B (copia de A):" << endl;
+    B.imprimir();
     
     delete A;
-    
-    return 0;
-    
+        
     return 0;
 }
