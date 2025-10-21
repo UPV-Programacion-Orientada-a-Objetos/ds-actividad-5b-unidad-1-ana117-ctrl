@@ -132,25 +132,34 @@ private:
     }
     
     MatrizBase<T>* sumar(const MatrizBase<T>& otra) const override {
-        if (this->_filas != otra.getFilas() || this->_columnas != otra.getColumnas()) {
-            cout << "Error: Las dimensiones no coinciden para la suma." << endl;
-            return nullptr;
-        }
-        
-        MatrizDinamica<T>* resultado = new MatrizDinamica<T>(this->_filas, this->_columnas);
-        
-        const MatrizDinamica<T>* otraDinamica = dynamic_cast<const MatrizDinamica<T>*>(&otra);
-        
+    if (this->_filas != otra.getFilas() || this->_columnas != otra.getColumnas()) {
+        cout << "Error: Las dimensiones no coinciden para la suma." << endl;
+        return nullptr;
+    }
+    
+    MatrizDinamica<T>* resultado = new MatrizDinamica<T>(this->_filas, this->_columnas);
+    
+    const MatrizDinamica<T>* otraDinamica = dynamic_cast<const MatrizDinamica<T>*>(&otra);
+    
+    if (otraDinamica) {
+        // Si es MatrizDinamica
         for (int i = 0; i < this->_filas; i++) {
             for (int j = 0; j < this->_columnas; j++) {
-                if (otraDinamica) {
-                    resultado->_datos[i][j] = _datos[i][j] + otraDinamica->_datos[i][j];
-                }
+                resultado->_datos[i][j] = _datos[i][j] + otraDinamica->_datos[i][j];
             }
         }
-        
-        return resultado;
+    } else {
+        // Si es MatrizEstatica u otro tipo, usar el método virtual sumar de la otra matriz
+        // y luego acceder al resultado
+        MatrizBase<T>* temp = otra.sumar(*this);
+        if (temp) {
+            delete resultado;
+            return temp;
+        }
     }
+    
+    return resultado;
+}
     
     void imprimir() const override {
         for (int i = 0; i < this->_filas; i++) {
@@ -239,15 +248,13 @@ public:
 //Main
 int main() {
     cout << "--- Sistema Genérico de Álgebra Lineal ---" << endl << endl;
+    // parte 1: Demostración con valores predefinidos 
+    cout << "Parte 1: Demostración Automática (FLOAT)" << endl;
     
-    cout << ">> Demostración de Genericidad (Tipo FLOAT) <<" << endl << endl;
-    
-    // Creación de Matriz Dinámica A
-    cout << "// 1. Creación de Matriz Dinámica (a través del puntero base)" << endl;
+    cout << "// 1. Creación de Matriz Dinámica" << endl;
     cout << "Creando Matriz Dinámica A (3x2)..." << endl;
     MatrizBase<float>* A = new MatrizDinamica<float>(3, 2);
     
-    // Cargar valores manualmente para A
     dynamic_cast<MatrizDinamica<float>*>(A)->setValor(0, 0, 1.5f);
     dynamic_cast<MatrizDinamica<float>*>(A)->setValor(0, 1, 2.0f);
     dynamic_cast<MatrizDinamica<float>*>(A)->setValor(1, 0, 0.0f);
@@ -259,12 +266,10 @@ int main() {
     A->imprimir();
     cout << endl;
     
-    //Creación de Matriz Estática B
-    cout << "// 2. Creación de Matriz Estática (a través del puntero base)" << endl;
+    cout << "// 2. Creación de Matriz Estática" << endl;
     cout << "Creando Matriz Estática B (3x2)..." << endl;
     MatrizBase<float>* B = new MatrizEstatica<float, 3, 2>();
     
-    // Cargar valores manualmente para B
     dynamic_cast<MatrizEstatica<float, 3, 2>*>(B)->setValor(0, 0, 0.5f);
     dynamic_cast<MatrizEstatica<float, 3, 2>*>(B)->setValor(0, 1, 1.0f);
     dynamic_cast<MatrizEstatica<float, 3, 2>*>(B)->setValor(1, 0, 2.0f);
@@ -276,10 +281,8 @@ int main() {
     B->imprimir();
     cout << endl;
     
-    //Operación Polimórfica (Suma)
-    cout << "// 3. Operación Polimórfica (Suma)" << endl;
+    cout << "// 3. Operación Polimórfica" << endl;
     cout << "SUMANDO: Matriz C = A + B ..." << endl;
-    cout << "(La suma es manejada por el método virtual de MatrizDinamica)" << endl << endl;
     
     MatrizBase<float>* C = *A + *B;
     
@@ -287,18 +290,55 @@ int main() {
     C->imprimir();
     cout << endl;
     
-    // 4. Limpieza de Memoria
-    cout << ">> Demostración de Limpieza de Memoria <<" << endl;
+    cout << "// 4. Limpiar de Memoria" << endl;
     cout << "Llamando al destructor de C..." << endl;
     delete C;
-    
     cout << "Llamando al destructor de A..." << endl;
     delete A;
-    
     cout << "Llamando al destructor de B..." << endl;
     delete B;
+    
+    cout << endl;
+    
+    //parte 2: Demostración con entrada del usuario 
+    cout << "Parte 2: Demostración Interactiva (valores tipo int)" << endl;
+    
+    cout << "// 1. Crear y cargar Matriz Dinámica D" << endl;
+    MatrizBase<int>* D = new MatrizDinamica<int>(2, 2);
+    D->cargarValores();
+    
+    cout << "\nMatriz D:" << endl;
+    D->imprimir();
+    cout << endl;
+    
+    cout << "// 2. Crear y cargar Matriz Dinámica E" << endl;
+    MatrizBase<int>* E = new MatrizDinamica<int>(2, 2);
+    E->cargarValores();
+    
+    cout << "\nMatriz E:" << endl;
+    E->imprimir();
+    cout << endl;
+    
+    cout << "// 3. Suma usando método sumar()" << endl;
+    MatrizBase<int>* F = D->sumar(*E);
+    
+    cout << "Matriz F = D + E:" << endl;
+    F->imprimir();
+    cout << endl;
+    
+    cout << "// 4. Demostración de Constructor de Copia" << endl;
+    MatrizDinamica<int>* G = new MatrizDinamica<int>(*dynamic_cast<MatrizDinamica<int>*>(D));
+    cout << "Matriz G:" << endl;
+    G->imprimir();
+    cout << endl;
+    
+    delete D;
+    delete E;
+    delete F;
+    delete G;
     
     cout << "Sistema cerrado." << endl;
     
     return 0;
+
 }
