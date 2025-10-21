@@ -71,6 +71,12 @@ private:
             }
         }
     }
+
+    void setValor(int i, int j, T valor) {
+        if (i >= 0 && i < this->_filas && j >= 0 && j < this->_columnas) {
+            _datos[i][j] = valor;
+        }
+    }
     
     MatrizBase<T>* sumar(const MatrizBase<T>& otra) const override {
         // Por implementar
@@ -78,7 +84,14 @@ private:
     }
     
     void imprimir() const override {
-        // Por implementar
+        for (int i = 0; i < this->_filas; i++) {
+            cout << "| ";
+            for (int j = 0; j < this->_columnas; j++) {
+                cout << fixed << setprecision(1) << _datos[i][j];
+                if (j < this->_columnas - 1) cout << " | ";
+            }
+            cout << " |" << endl;
+        }
     }
 };
 
@@ -86,6 +99,19 @@ private:
 int main() {
     cout << "--- Sistema Genérico de Álgebra Lineal ---" << endl;
     cout << ">> Demostración de Genericidad (Tipo FLOAT) <<"<< endl;
+
+    MatrizDinamica<float>* A = new MatrizDinamica<float>(2, 2);
+    A->setValor(0, 0, 1.5f);
+    A->setValor(0, 1, 2.0f);
+    A->setValor(1, 0, 3.5f);
+    A->setValor(1, 1, 4.0f);
+    
+    cout << "Matriz A:" << endl;
+    A->imprimir();
+    
+    delete A;
+    
+    return 0;
     
     return 0;
 }
