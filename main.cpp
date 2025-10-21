@@ -162,36 +162,109 @@ private:
             cout << " |" << endl;
         }
     }
+
+    template <typename U, int M, int N>
+    friend class MatrizEstatica;
+};
+
+//Matriz estatica
+template <typename T, int M, int N>
+class MatrizEstatica : public MatrizBase<T> {
+private:
+    T _datos[M][N];
+
+public:
+    MatrizEstatica() : MatrizBase<T>(M, N) {
+        for (int i = 0; i < M; i++) {
+            for (int j = 0; j < N; j++) {
+                _datos[i][j] = T(0);
+            }
+        }
+    }
+    
+    void cargarValores() override {
+        cout << "Ingrese los valores para la matriz (" << M << "x" << N << "):" << endl;
+        for (int i = 0; i < M; i++) {
+            for (int j = 0; j < N; j++) {
+                cout << "Elemento [" << i << "][" << j << "]: ";
+                cin >> _datos[i][j];
+            }
+        }
+    }
+    
+    void setValor(int i, int j, T valor) {
+        if (i >= 0 && i < M && j >= 0 && j < N) {
+            _datos[i][j] = valor;
+        }
+    }
+    
+    MatrizBase<T>* sumar(const MatrizBase<T>& otra) const override {
+        if (M != otra.getFilas() || N != otra.getColumnas()) {
+            cout << "Error: Las dimensiones no coinciden para la suma." << endl;
+            return nullptr;
+        }
+        
+        MatrizDinamica<T>* resultado = new MatrizDinamica<T>(M, N);
+        
+        const MatrizEstatica<T, M, N>* otraEstatica = dynamic_cast<const MatrizEstatica<T, M, N>*>(&otra);
+        const MatrizDinamica<T>* otraDinamica = dynamic_cast<const MatrizDinamica<T>*>(&otra);
+        
+        for (int i = 0; i < M; i++) {
+            for (int j = 0; j < N; j++) {
+                T valorOtra = T(0);
+                if (otraEstatica) {
+                    valorOtra = otraEstatica->_datos[i][j];
+                } else if (otraDinamica) {
+                    valorOtra = otraDinamica->_datos[i][j];
+                }
+                resultado->setValor(i, j, _datos[i][j] + valorOtra);
+            }
+        }
+        
+        return resultado;
+    }
+    
+    void imprimir() const override {
+        for (int i = 0; i < M; i++) {
+            cout << "| ";
+            for (int j = 0; j < N; j++) {
+                cout << fixed << setprecision(1) << _datos[i][j];
+                if (j < N - 1) cout << " | ";
+            }
+            cout << " |" << endl;
+        }
+    }
 };
 
 //Main
 int main() {
     cout << "--- Sistema Genérico de Álgebra Lineal ---" << endl << endl;
     
+     // Probar MatrizDinamica
     MatrizBase<float>* A = new MatrizDinamica<float>(2, 2);
     dynamic_cast<MatrizDinamica<float>*>(A)->setValor(0, 0, 1.5f);
     dynamic_cast<MatrizDinamica<float>*>(A)->setValor(0, 1, 2.0f);
     dynamic_cast<MatrizDinamica<float>*>(A)->setValor(1, 0, 3.5f);
     dynamic_cast<MatrizDinamica<float>*>(A)->setValor(1, 1, 4.0f);
     
-    cout << "Matriz A:" << endl;
+    cout << "Matriz Dinámica A:" << endl;
     A->imprimir();
     cout << endl;
     
-    MatrizBase<float>* B = new MatrizDinamica<float>(2, 2);
-    dynamic_cast<MatrizDinamica<float>*>(B)->setValor(0, 0, 0.5f);
-    dynamic_cast<MatrizDinamica<float>*>(B)->setValor(0, 1, 1.0f);
-    dynamic_cast<MatrizDinamica<float>*>(B)->setValor(1, 0, 2.5f);
-    dynamic_cast<MatrizDinamica<float>*>(B)->setValor(1, 1, 3.0f);
+    // Probar MatrizEstatica
+    MatrizBase<float>* B = new MatrizEstatica<float, 2, 2>();
+    dynamic_cast<MatrizEstatica<float, 2, 2>*>(B)->setValor(0, 0, 0.5f);
+    dynamic_cast<MatrizEstatica<float, 2, 2>*>(B)->setValor(0, 1, 1.0f);
+    dynamic_cast<MatrizEstatica<float, 2, 2>*>(B)->setValor(1, 0, 2.5f);
+    dynamic_cast<MatrizEstatica<float, 2, 2>*>(B)->setValor(1, 1, 3.0f);
     
-    cout << "Matriz B:" << endl;
+    cout << "Matriz Estática B:" << endl;
     B->imprimir();
     cout << endl;
     
-    // Usando el operador + sobrecargado
-    cout << "Usando operador + sobrecargado..." << endl;
+    // Sumar Dinámica + Estática
     MatrizBase<float>* C = *A + *B;
-    cout << "Matriz C = A + B:" << endl;
+    cout << "Matriz C = A + B (Dinámica + Estática):" << endl;
     C->imprimir();
     
     delete A;
