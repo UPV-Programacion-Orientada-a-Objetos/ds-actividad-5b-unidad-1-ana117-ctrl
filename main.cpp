@@ -127,8 +127,24 @@ private:
     }
     
     MatrizBase<T>* sumar(const MatrizBase<T>& otra) const override {
-        // Por implementar
-        return nullptr;
+        if (this->_filas != otra.getFilas() || this->_columnas != otra.getColumnas()) {
+            cout << "Error: Las dimensiones no coinciden para la suma." << endl;
+            return nullptr;
+        }
+        
+        MatrizDinamica<T>* resultado = new MatrizDinamica<T>(this->_filas, this->_columnas);
+        
+        const MatrizDinamica<T>* otraDinamica = dynamic_cast<const MatrizDinamica<T>*>(&otra);
+        
+        for (int i = 0; i < this->_filas; i++) {
+            for (int j = 0; j < this->_columnas; j++) {
+                if (otraDinamica) {
+                    resultado->_datos[i][j] = _datos[i][j] + otraDinamica->_datos[i][j];
+                }
+            }
+        }
+        
+        return resultado;
     }
     
     void imprimir() const override {
@@ -145,25 +161,35 @@ private:
 
 //Main
 int main() {
-    cout << "--- Sistema Genérico de Álgebra Lineal ---" << endl;
-    cout << ">> Demostración de Genericidad (Tipo FLOAT) <<"<< endl;
-
-    MatrizDinamica<float>* A = new MatrizDinamica<float>(2, 2);
-    A->setValor(0, 0, 1.5f);
-    A->setValor(0, 1, 2.0f);
-    A->setValor(1, 0, 3.5f);
-    A->setValor(1, 1, 4.0f);
+    cout << "--- Sistema Genérico de Álgebra Lineal ---" << endl << endl;
     
-    cout << "Matriz A (original):" << endl;
+    MatrizBase<float>* A = new MatrizDinamica<float>(2, 2);
+    dynamic_cast<MatrizDinamica<float>*>(A)->setValor(0, 0, 1.5f);
+    dynamic_cast<MatrizDinamica<float>*>(A)->setValor(0, 1, 2.0f);
+    dynamic_cast<MatrizDinamica<float>*>(A)->setValor(1, 0, 3.5f);
+    dynamic_cast<MatrizDinamica<float>*>(A)->setValor(1, 1, 4.0f);
+    
+    cout << "Matriz A:" << endl;
     A->imprimir();
-    cout<<endl;
-
-    //probar constructor de copia 
-    MatrizDinamica<float>B(*A);
-    cout << "Matriz B (copia de A):" << endl;
-    B.imprimir();
+    cout << endl;
+    
+    MatrizBase<float>* B = new MatrizDinamica<float>(2, 2);
+    dynamic_cast<MatrizDinamica<float>*>(B)->setValor(0, 0, 0.5f);
+    dynamic_cast<MatrizDinamica<float>*>(B)->setValor(0, 1, 1.0f);
+    dynamic_cast<MatrizDinamica<float>*>(B)->setValor(1, 0, 2.5f);
+    dynamic_cast<MatrizDinamica<float>*>(B)->setValor(1, 1, 3.0f);
+    
+    cout << "Matriz B:" << endl;
+    B->imprimir();
+    cout << endl;
+    
+    MatrizBase<float>* C = A->sumar(*B);
+    cout << "Matriz C = A + B:" << endl;
+    C->imprimir();
     
     delete A;
-        
+    delete B;
+    delete C;
+    
     return 0;
 }
