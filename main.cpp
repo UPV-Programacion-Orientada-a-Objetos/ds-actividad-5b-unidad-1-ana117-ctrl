@@ -16,6 +16,11 @@ public:
     virtual void cargarValores() = 0;
     virtual MatrizBase<T>* sumar(const MatrizBase<T>& otra) const = 0;
     virtual void imprimir() const = 0;
+
+    // Sobrecarga del operador +
+    MatrizBase<T>* operator+(const MatrizBase<T>& otra) const {
+        return sumar(otra);
+    }
     
     int getFilas() const { return _filas; }
     int getColumnas() const { return _columnas; }
@@ -183,7 +188,9 @@ int main() {
     B->imprimir();
     cout << endl;
     
-    MatrizBase<float>* C = A->sumar(*B);
+    // Usando el operador + sobrecargado
+    cout << "Usando operador + sobrecargado..." << endl;
+    MatrizBase<float>* C = *A + *B;
     cout << "Matriz C = A + B:" << endl;
     C->imprimir();
     
