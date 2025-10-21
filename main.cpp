@@ -240,36 +240,65 @@ public:
 int main() {
     cout << "--- Sistema Genérico de Álgebra Lineal ---" << endl << endl;
     
-     // Probar MatrizDinamica
-    MatrizBase<float>* A = new MatrizDinamica<float>(2, 2);
+    cout << ">> Demostración de Genericidad (Tipo FLOAT) <<" << endl << endl;
+    
+    // Creación de Matriz Dinámica A
+    cout << "// 1. Creación de Matriz Dinámica (a través del puntero base)" << endl;
+    cout << "Creando Matriz Dinámica A (3x2)..." << endl;
+    MatrizBase<float>* A = new MatrizDinamica<float>(3, 2);
+    
+    // Cargar valores manualmente para A
     dynamic_cast<MatrizDinamica<float>*>(A)->setValor(0, 0, 1.5f);
     dynamic_cast<MatrizDinamica<float>*>(A)->setValor(0, 1, 2.0f);
-    dynamic_cast<MatrizDinamica<float>*>(A)->setValor(1, 0, 3.5f);
-    dynamic_cast<MatrizDinamica<float>*>(A)->setValor(1, 1, 4.0f);
+    dynamic_cast<MatrizDinamica<float>*>(A)->setValor(1, 0, 0.0f);
+    dynamic_cast<MatrizDinamica<float>*>(A)->setValor(1, 1, 1.0f);
+    dynamic_cast<MatrizDinamica<float>*>(A)->setValor(2, 0, 4.5f);
+    dynamic_cast<MatrizDinamica<float>*>(A)->setValor(2, 1, 3.0f);
     
-    cout << "Matriz Dinámica A:" << endl;
+    cout << "A =" << endl;
     A->imprimir();
     cout << endl;
     
-    // Probar MatrizEstatica
-    MatrizBase<float>* B = new MatrizEstatica<float, 2, 2>();
-    dynamic_cast<MatrizEstatica<float, 2, 2>*>(B)->setValor(0, 0, 0.5f);
-    dynamic_cast<MatrizEstatica<float, 2, 2>*>(B)->setValor(0, 1, 1.0f);
-    dynamic_cast<MatrizEstatica<float, 2, 2>*>(B)->setValor(1, 0, 2.5f);
-    dynamic_cast<MatrizEstatica<float, 2, 2>*>(B)->setValor(1, 1, 3.0f);
+    //Creación de Matriz Estática B
+    cout << "// 2. Creación de Matriz Estática (a través del puntero base)" << endl;
+    cout << "Creando Matriz Estática B (3x2)..." << endl;
+    MatrizBase<float>* B = new MatrizEstatica<float, 3, 2>();
     
-    cout << "Matriz Estática B:" << endl;
+    // Cargar valores manualmente para B
+    dynamic_cast<MatrizEstatica<float, 3, 2>*>(B)->setValor(0, 0, 0.5f);
+    dynamic_cast<MatrizEstatica<float, 3, 2>*>(B)->setValor(0, 1, 1.0f);
+    dynamic_cast<MatrizEstatica<float, 3, 2>*>(B)->setValor(1, 0, 2.0f);
+    dynamic_cast<MatrizEstatica<float, 3, 2>*>(B)->setValor(1, 1, 3.0f);
+    dynamic_cast<MatrizEstatica<float, 3, 2>*>(B)->setValor(2, 0, 1.0f);
+    dynamic_cast<MatrizEstatica<float, 3, 2>*>(B)->setValor(2, 1, 1.0f);
+    
+    cout << "B =" << endl;
     B->imprimir();
     cout << endl;
     
-    // Sumar Dinámica + Estática
-    MatrizBase<float>* C = *A + *B;
-    cout << "Matriz C = A + B (Dinámica + Estática):" << endl;
-    C->imprimir();
+    //Operación Polimórfica (Suma)
+    cout << "// 3. Operación Polimórfica (Suma)" << endl;
+    cout << "SUMANDO: Matriz C = A + B ..." << endl;
+    cout << "(La suma es manejada por el método virtual de MatrizDinamica)" << endl << endl;
     
-    delete A;
-    delete B;
+    MatrizBase<float>* C = *A + *B;
+    
+    cout << "Matriz Resultado C (3x2, Tipo FLOAT):" << endl;
+    C->imprimir();
+    cout << endl;
+    
+    // 4. Limpieza de Memoria
+    cout << ">> Demostración de Limpieza de Memoria <<" << endl;
+    cout << "Llamando al destructor de C..." << endl;
     delete C;
+    
+    cout << "Llamando al destructor de A..." << endl;
+    delete A;
+    
+    cout << "Llamando al destructor de B..." << endl;
+    delete B;
+    
+    cout << "Sistema cerrado." << endl;
     
     return 0;
 }
